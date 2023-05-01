@@ -5,13 +5,38 @@ format: html
 editor: visual
 ---
 
+##TO DO: Make this Corbel/Cambria
 
-
-I picked up the binary enthropy function from MacKay's 2003 classic *Information Theory, Inference, and Learning Algorithms*.
+I picked up the binary entropy function from MacKay's 2003 classic *Information Theory, Inference, and Learning Algorithms*, where it is used to derive approximations for combinations in evaluating the probabilities of error in different repetition codes (basically codes that rely on transmitting the same bit multiple times to minimize risk of transmission errors).
 
 The formula for the function looks like this(MacKay 2003: 2): 
 $$
 H_2(x) = xlog \frac{1}{x} + (1 - x)log \frac{1}{1-x}
 $$
 
-What I want to do here is to build an Monte Carlo rejection sampler to integrate the function. However, before getting to building the sampler, lets first write a function for the binary entropy function and 
+What I want to do here is to build an Monte Carlo rejection sampler to integrate the function. However, before getting to building the sampler, lets first write a function for the binary entropy function and plot the beast.
+
+```{r}
+### Binary entropy function.
+### This function takes on an x between zero and one and returns the H2(x) of this value
+
+h2x <- function (x){
+  x * log2(1/x) + (1-x) * log2(1/(1-x)) #Note that the binary entropy function 
+}
+
+h2x_df <- data.frame(x = seq(0.01, 0.99, 0.01), h2x = h2x(seq(0.01, 0.99, 0.01)))
+
+library(ggplot2)
+
+ggplot(h2x_df, aes(x = x, y = h2x)) +
+  geom_line() +
+  theme_bw() +
+  labs(
+    title = "Binary entropy function",
+  ) +
+  ylab(bquote(H[2](x)))
+
+
+```
+
+As we can see the function forms an arc that starts at zero, ends at one and has a maximum value of one. This maximum value will prove helpful when building the rejection sampler.
