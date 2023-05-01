@@ -1,0 +1,17 @@
+---
+title: "Lets integrate a binary enthropy function with MC"
+author: "Piotr Jacobsson"
+format: html
+editor: visual
+---
+
+
+
+I picked up the binary enthropy function from MacKay's 2003 classic *Information Theory, Inference, and Learning Algorithms*.
+
+The formula for the function looks like this(MacKay 2003: 2): 
+$$
+H_2(x) = xlog \frac{1}{x} + (1 - x)log \frac{1}{1-x}
+$$
+
+What I want to do here is to build an Monte Carlo rejection sampler to integrate the function. However, before getting to building the sampler, lets first write a function for the binary entropy function and 
