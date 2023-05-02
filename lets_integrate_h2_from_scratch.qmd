@@ -52,15 +52,40 @@ library(purrr)
 
 ##First set up a base DF, with 10000 sims.
 
-sampler_results <- data.frame(inputs = runif(10000, 0, 1)) %>%
-  
+sampler_results <- data.frame(x_vals = runif(10000, 0, 1), 
+                              y_vals = runif(10000, 0, 1)) %>%
+  ##Next check if the values are less than the H2(x) values
+  mutate(
+    h2x_vals = h2x(x_vals),
+    less_h2x = if_else(y_vals <= h2x_vals, TRUE, FALSE) #I broke this up into two steps, so I can check if the intermediate steps work the way they should :)
+  )
 
 
 ```
 
+As the area covered by the box equals to one, the ratio of dots "under" the curve to the total number of dots generated is the actual result.
 
+```{r}
 
+area_under_curve <- sampler_results %>%
+  summarize(
+    n_total = n(),
+    under_curve = sum(less_h2x),
+    area = under_curve / n_total
+  ) %>%
+  pull(area)
 
+area_under_curve
+
+```
+
+We can also visualize the area by plotting the individual dots passed to the sampler:
+```{r}
+sampler_results %>%
+  ggplot(aes(x = x_vals, y = y_vals, color = less_h2x)) +
+  geom_point() +
+  theme_classic()
+```
 
 
 
