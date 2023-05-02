@@ -40,3 +40,30 @@ ggplot(h2x_df, aes(x = x, y = h2x)) +
 ```
 
 As we can see the function forms an arc that starts at zero, ends at one and has a maximum value of one. This maximum value will prove helpful when building the rejection sampler.
+
+## The sampler
+Now that we know what the function looks like, lets build the sampler. Lets iterate the design a little. In the first stage, we will just write out the code that gives us the result.To make things a little more interesting, we will try to use purr iterations rather than traditional for loops. Next we'll wrap it into a function. Last, we'll modify the function, so that it can take on single variable function as an input.
+
+OK, so lets get onto the first step. Building the sampler itself.
+
+```{r}
+library(dplyr)
+library(purrr)
+
+##First set up a base DF, with 10000 sims.
+
+sampler_results <- data.frame(inputs = runif(10000, 0, 1)) %>%
+  
+
+
+```
+
+
+
+
+
+
+
+
+
+
