@@ -87,6 +87,39 @@ sampler_results %>%
   theme_classic()
 ```
 
+So the sampler is working. Now lets turn it into a function, so we can begin exploring it further.
+
+```{r}
+h2x_sampler <- function (x1, x2, n_sims){
+  ### Takes on values of x and returns the H2(x) integral between those values.
+  ### Assumes x1 < x2 and 0 < x1, x2 < 1
+  
+  
+  sampler_results <- data.frame(x_vals = runif(n_sims, x1, x2), 
+                              y_vals = runif(n_sims, 0, 1)) %>%
+  ##Next check if the values are less than the H2(x) values
+  mutate(
+    h2x_vals = h2x(x_vals),
+    less_h2x = if_else(y_vals <= h2x_vals, TRUE, FALSE) #I broke this up into two steps, so I can check if the intermediate steps work the way they should :)
+  )
+  
+  sampler_results
+}
+
+
+#Run a visual test
+
+h2x_sampler(0.3, 0.8, 100) %>%
+  ggplot(aes(x = x_vals, y = y_vals, color = less_h2x)) +
+  geom_point() +
+  theme_classic()
+
+h2x_sampler(0.3, 0.8, 100000) %>%
+  ggplot(aes(x = x_vals, y = y_vals, color = less_h2x)) +
+  geom_point() +
+  theme_classic()
+
+```
 
 
 
