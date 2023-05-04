@@ -90,7 +90,7 @@ sampler_results %>%
 So the sampler is working. Now lets turn it into a function, so we can begin exploring it further.
 
 ```{r}
-h2x_sampler <- function (x1, x2, n_sims){
+sample_h2x <- function (x1, x2, n_sims){
   ### Takes on values of x and returns the H2(x) integral between those values.
   ### Assumes x1 < x2 and 0 < x1, x2 < 1
   
@@ -109,17 +109,37 @@ h2x_sampler <- function (x1, x2, n_sims){
 
 #Run a visual test
 
-h2x_sampler(0.3, 0.8, 100) %>%
+sample_h2x(0.3, 0.8, 100) %>%
   ggplot(aes(x = x_vals, y = y_vals, color = less_h2x)) +
   geom_point() +
   theme_classic()
 
-h2x_sampler(0.3, 0.8, 100000) %>%
+sample_h2x(0.3, 0.8, 100000) %>%
   ggplot(aes(x = x_vals, y = y_vals, color = less_h2x)) +
   geom_point() +
   theme_classic()
 
 ```
+
+So, we now have a working core sampler, what we do not have is something to produce results. This will require building a little more.
+
+Our general approach here will be:
+* Build a function that takes the simulation table produced by the sampler
+* Summarizes this information in terms of area under the curve 
+* Build a wrapper function for the two.
+
+The reason for having two functions and a wrapper rather than a function running on top of the sampler, is that I want to avoid nesting functions. Also, it means that we can then use those seperately if need be (and there might be once we start getting deeper into the project).
+
+```{r}
+read_h2x_mc <- function (sampler_results, x1, x2, y1, y2){
+  ###The function 
+  
+  
+  
+}
+```
+
+
 
 
 
