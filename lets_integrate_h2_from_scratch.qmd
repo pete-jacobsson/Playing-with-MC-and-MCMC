@@ -159,8 +159,61 @@ sample_h2x(0, 1, 10000) %>%
 ```
 
 ```{r}
+wrap_h2x_mc <- function (x1, x2, y1 = 0, y2 = 0, n_sims){
+  ###Wrapper function chaining the actual MC simulation and the result reader
+  
+  sample_h2x(x1, x2, n_sims) %>%
+    read_h2x_mc(x1, x2)
+  
+}
+
+##Test
+wrap_h2x_mc(x1= 0.2, x2 = 0.35, n_sims = 5000)
+
+
 
 ```
+
+We thus have a function that takes on the x-values for which we want to calculate the integral of H2(x) and returns an MC estimate of the area under the curve. However, because we are doing Monte Carlo simulations, the result is always a little off from the actual result. We can minimize this discrepancy by increasing the sample size, however this comes at the cost of having to create more simulated results, which in turns translates to greater computational requirements. Does it matter for this kind of project? Not really, but it would be fun to finish with something that attains a given level of accuracy by itself, while also modulating the height of the envelope (remember, the more space above the curve gets samples, the lower the simulation efficiency!).
+
+To do this we shall write a new, more complex wrapper function. What it will take on in addition is the target standard deviation of a group of MC simulations, as well as the x1 and x2 constraints. What it will return is the mean value of five simulations, alongside the standard deviation of the group - which has to be less than the target set at the beginning. What it will also need to do is figure out the maximum value of y for the given x1/x2 and use that to set the simulation parameters. Last, we want it to get there without any extra input.
+
+The way we can do this is through the following steps:
+1. First determine the value of y1
+2. Initiate a while loop that looks for getting the SD level we want.
+3. Once it gets desired precision, break out of the while loop and return the result.
+
+Actually, to make this a little more fun, lets set the number of individual simulation to be a variable as well. Thus, the function we are after looks something like this:
+
+```{r}
+wrap_control_h2x_mc <- function (x1, x2, target_sd, num_mcs){
+  ### The function takes on arguments relating to the range over which we want to integrate and returns the distribution of num_mcs results, with an SD of less than the target_sd.
+  ### Assumes x1>x2
+  
+  ## Calculate max y
+  y2 <- data.frame(x_values = seq(x1, x2, length.out = 100)) %>%
+    mutate(y_values = h2x(x_values)) %>%
+    summarize(max_y = max(y_values, na.rm = TRUE)) %>%
+    pull(max_y)
+  
+  y2 <- min(1, y2 + 0.01) #What we want to do here is make sure that the upper sampler level is over the actual maximum within a given range
+
+  y2    
+}
+
+
+##Test
+wrap_control_h2x_mc(x1 = 0, x2=  1)
+wrap_control_h2x_mc(x1 = 0, x2 = 0.2)
+
+
+```
+
+
+
+
+
+
 
 
 
