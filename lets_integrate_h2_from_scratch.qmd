@@ -131,12 +131,31 @@ Our general approach here will be:
 The reason for having two functions and a wrapper rather than a function running on top of the sampler, is that I want to avoid nesting functions. Also, it means that we can then use those seperately if need be (and there might be once we start getting deeper into the project).
 
 ```{r}
-read_h2x_mc <- function (sampler_results, x1, x2, y1, y2){
-  ###The function 
+read_h2x_mc <- function (mc_results, x1, x2, y1 = 0, y2 = 1){
+  ###The function takes on the raw MC results and returns the area under the curve between X1 and x2.
   
+  area_checked <- (x2 - x1) * (y2 - y1)
   
+  result <- mc_results %>%
+    summarize(
+      n_total = n(),
+      n_under = sum(less_h2x),
+      area_under_curve = area_checked * n_under / n_total
+    ) %>%
+    pull(area_under_curve)
+    
+  
+  round(result[1], 3) #Return as a single value, not a vector
   
 }
+
+##Test
+sample_h2x(0, 1, 10000) %>%
+  read_h2x_mc(x1 = 0, x2 = 1)
+
+
+
+
 ```
 
 
