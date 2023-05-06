@@ -198,7 +198,29 @@ wrap_control_h2x_mc <- function (x1, x2, target_sd, num_mcs){
   
   y2 <- min(1, y2 + 0.01) #What we want to do here is make sure that the upper sampler level is over the actual maximum within a given range
 
-  y2    
+  ## Set up the vector  to track the different MC results
+  n_sims <- 1000
+  mc_sigma <- 20 #Set a too high starting MC sigma to avoid the while loop from not working
+  
+  while (mc_sigma > target_sd) {
+    mc_results <- c()
+    
+    for (i in 1:num_mcs) {
+      indiv_mc_result <- sample_h2x(x1, x2, n_sims) %>%
+        read_h2x_mc(x1, x2, y1 = 0, y2 = y2)
+      
+      mc_results <- c(mc_results, indiv_mc_result)
+      
+    }
+    n_sims <- n_sims * 2
+    mc_sigma <- sd(mc_results)
+    
+    
+  }
+  
+  
+  
+  
 }
 
 
