@@ -1,20 +1,22 @@
 ---
 title: "Lets integrate a binary enthropy function with MC"
 author: "Piotr Jacobsson"
-format: html
+format: 
+  html:
+    mainfont: "Cambria"
+    sansfont: "Corbel"
 editor: visual
 ---
 
-##TO DO: Make this Corbel/Cambria
+I learned the binary entropy function from MacKay's 2003 *Information Theory, Inference, and Learning Algorithms*, where it is used to derive approximations for combinations in evaluating the probabilities of error in different repetition codes (basically codes that rely on transmitting the same bit multiple times to minimize risk of transmission errors).
 
-I picked up the binary entropy function from MacKay's 2003 classic *Information Theory, Inference, and Learning Algorithms*, where it is used to derive approximations for combinations in evaluating the probabilities of error in different repetition codes (basically codes that rely on transmitting the same bit multiple times to minimize risk of transmission errors).
-
-The formula for the function looks like this(MacKay 2003: 2): 
-$$
+The formula for the function looks like this(MacKay 2003: 2): $$
 H_2(x) = xlog \frac{1}{x} + (1 - x)log \frac{1}{1-x}
 $$
 
-What I want to do here is to build an Monte Carlo rejection sampler to integrate the function. However, before getting to building the sampler, lets first write a function for the binary entropy function and plot the beast.
+What I want to do here is to build an Monte Carlo rejection simulation to integrate the function. Why use Monte Carlo? Because I'm too thick to integrate this thing. Why a rejection Monte Carlo? Because, as we'll see, it's dead easy to set. What is a Monte Carlo simulation? It's a stochastic method of evaluating area under a curve - the rejection approach relies on drawing a known size box around the area over which we want to integrate, dropping a whole lot of dots on it, and then checking what proportion ended up below the curve.
+
+However, before getting to building the simulation lets first write a function for the binary entropy function and plot the beast.
 
 ```{r}
 ### Binary entropy function.
@@ -39,16 +41,17 @@ ggplot(h2x_df, aes(x = x, y = h2x)) +
 
 ```
 
-As we can see the function forms an arc that starts at zero, ends at one and has a maximum value of one. This maximum value will prove helpful when building the rejection sampler.
+As we can see the function forms an arc that starts at zero, ends at one and has a maximum value of one. This maximum value will prove helpful when building the Monte Carlo simulation, because now we can set out simulation "box" with a y maximum of 1. Why do we want to put the value as close to the function maximum as possible? We want the box to be as small as possible (more dots end up under the curve and thus we get better accuracy), but it can't go below the maximum of the function over the parameters of interest - if it does, we'll underestimate the area!
 
-## The sampler
-Now that we know what the function looks like, lets build the sampler. Lets iterate the design a little. In the first stage, we will just write out the code that gives us the result.To make things a little more interesting, we will try to use purr iterations rather than traditional for loops. Next we'll wrap it into a function. Last, we'll modify the function, so that it can take on single variable function as an input.
+## The simulation
+
+Now that we know what the function looks like, lets build the sampler. Lets iterate the design a little. In the first stage, we will just write out the code that gives us the result.To make things a little more interesting, we will vectorize the draws rather than use traditional for Loops (for a For Loopy version have a look at Lynch 2007). Next we'll wrap it into a function. Last, we'll modify the function, so that it can attain an accuracy level we want from it automatically.
 
 OK, so lets get onto the first step. Building the sampler itself.
 
 ```{r}
 library(dplyr)
-library(purrr)
+##library(purrr) - I thought I'd need purr. Then i realized how simple this is if we vectorize :)
 
 ##First set up a base DF, with 10000 sims.
 
@@ -80,6 +83,7 @@ area_under_curve
 ```
 
 We can also visualize the area by plotting the individual dots passed to the sampler:
+
 ```{r}
 sampler_results %>%
   ggplot(aes(x = x_vals, y = y_vals, color = less_h2x)) +
@@ -124,9 +128,12 @@ sample_h2x(0.3, 0.8, 100000) %>%
 So, we now have a working core sampler, what we do not have is something to produce results. This will require building a little more.
 
 Our general approach here will be:
-* Build a function that takes the simulation table produced by the sampler
-* Summarizes this information in terms of area under the curve 
-* Build a wrapper function for the two.
+
+\* Build a function that takes the simulation table produced by the sampler
+
+\* Summarizes this information in terms of area under the curve
+
+\* Build a wrapper function for the two.
 
 The reason for having two functions and a wrapper rather than a function running on top of the sampler, is that I want to avoid nesting functions. Also, it means that we can then use those seperately if need be (and there might be once we start getting deeper into the project).
 
@@ -178,10 +185,7 @@ We thus have a function that takes on the x-values for which we want to calculat
 
 To do this we shall write a new, more complex wrapper function. What it will take on in addition is the target standard deviation of a group of MC simulations, as well as the x1 and x2 constraints. What it will return is the mean value of five simulations, alongside the standard deviation of the group - which has to be less than the target set at the beginning. What it will also need to do is figure out the maximum value of y for the given x1/x2 and use that to set the simulation parameters. Last, we want it to get there without any extra input.
 
-The way we can do this is through the following steps:
-1. First determine the value of y1
-2. Initiate a while loop that looks for getting the SD level we want.
-3. Once it gets desired precision, break out of the while loop and return the result.
+The way we can do this is through the following steps: 1. First determine the value of y1 2. Initiate a while loop that looks for getting the SD level we want. 3. Once it gets desired precision, break out of the while loop and return the result.
 
 Actually, to make this a little more fun, lets set the number of individual simulation to be a variable as well. Thus, the function we are after looks something like this:
 
@@ -233,15 +237,3 @@ wrap_control_h2x_mc(x1 = 0, x2 = 0.2, target_sd = 0.000001, num_mcs = 5)
 
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
