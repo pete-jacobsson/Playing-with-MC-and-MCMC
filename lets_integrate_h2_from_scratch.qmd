@@ -82,7 +82,7 @@ area_under_curve
 
 ```
 
-We can also visualize the area by plotting the individual dots passed to the sampler:
+We can also visualize the area by plotting the individual dots passed to the simulation.
 
 ```{r}
 sampler_results %>%
@@ -91,15 +91,15 @@ sampler_results %>%
   theme_classic()
 ```
 
-So the sampler is working. Now lets turn it into a function, so we can begin exploring it further.
+Now that we see that our sampler is working, lets turn it into a function, so we can begin exploring it further.
 
 ```{r}
-sample_h2x <- function (x1, x2, n_sims){
+simulate_h2x <- function (x1, x2, n_sims){
   ### Takes on values of x and returns the H2(x) integral between those values.
   ### Assumes x1 < x2 and 0 < x1, x2 < 1
   
   
-  sampler_results <- data.frame(x_vals = runif(n_sims, x1, x2), 
+  simulation_results <- data.frame(x_vals = runif(n_sims, x1, x2), 
                               y_vals = runif(n_sims, 0, 1)) %>%
   ##Next check if the values are less than the H2(x) values
   mutate(
@@ -107,18 +107,13 @@ sample_h2x <- function (x1, x2, n_sims){
     less_h2x = if_else(y_vals <= h2x_vals, TRUE, FALSE) #I broke this up into two steps, so I can check if the intermediate steps work the way they should :)
   )
   
-  sampler_results
+  simulation_results
 }
 
 
 #Run a visual test
 
-sample_h2x(0.3, 0.8, 100) %>%
-  ggplot(aes(x = x_vals, y = y_vals, color = less_h2x)) +
-  geom_point() +
-  theme_classic()
-
-sample_h2x(0.3, 0.8, 100000) %>%
+simulate_h2x(0.3, 0.8, 10000) %>%
   ggplot(aes(x = x_vals, y = y_vals, color = less_h2x)) +
   geom_point() +
   theme_classic()
@@ -157,7 +152,7 @@ read_h2x_mc <- function (mc_results, x1, x2, y1 = 0, y2 = 1){
 }
 
 ##Test
-sample_h2x(0, 1, 10000) %>%
+simulate_h2x(0, 1, 10000) %>%
   read_h2x_mc(x1 = 0, x2 = 1)
 
 
@@ -169,7 +164,7 @@ sample_h2x(0, 1, 10000) %>%
 wrap_h2x_mc <- function (x1, x2, y1 = 0, y2 = 0, n_sims){
   ###Wrapper function chaining the actual MC simulation and the result reader
   
-  sample_h2x(x1, x2, n_sims) %>%
+  simulate_h2x(x1, x2, n_sims) %>%
     read_h2x_mc(x1, x2)
   
 }
@@ -181,13 +176,20 @@ wrap_h2x_mc(x1= 0.2, x2 = 0.35, n_sims = 5000)
 
 ```
 
-We thus have a function that takes on the x-values for which we want to calculate the integral of H2(x) and returns an MC estimate of the area under the curve. However, because we are doing Monte Carlo simulations, the result is always a little off from the actual result. We can minimize this discrepancy by increasing the sample size, however this comes at the cost of having to create more simulated results, which in turns translates to greater computational requirements. Does it matter for this kind of project? Not really, but it would be fun to finish with something that attains a given level of accuracy by itself, while also modulating the height of the envelope (remember, the more space above the curve gets samples, the lower the simulation efficiency!).
+We thus have a function that takes on the x-values for which we want to calculate the integral of H2(x) and returns an MC estimate of the area under the curve. However, because we are doing Monte Carlo simulations, the result is always a little off from the actual result. This is because, unless we have placed a lot of points into the simulation, we will always have a slightly different result different times we simulate. Or to put it visually - when there are too few points, we can't capture the function well (see the figure below).
+
+```{r}
+simulate_h2x(0, 1, 500) %>%
+  ggplot(aes(x = x_vals, y = y_vals, color = less_h2x)) +
+  geom_point() +
+  theme_classic()
+```
+
+We can minimize this discrepancy by increasing the sample size, however this comes at the cost of having to create more simulated results, which in turns translates to greater computational requirements. Does it matter for this kind of project? Not really, but it would be fun to finish with something that attains a given level of accuracy by itself, while also modulating the height of the envelope (remember, the more space above the curve gets samples, the lower the simulation efficiency!).
 
 To do this we shall write a new, more complex wrapper function. What it will take on in addition is the target standard deviation of a group of MC simulations, as well as the x1 and x2 constraints. What it will return is the mean value of five simulations, alongside the standard deviation of the group - which has to be less than the target set at the beginning. What it will also need to do is figure out the maximum value of y for the given x1/x2 and use that to set the simulation parameters. Last, we want it to get there without any extra input.
 
-The way we can do this is through the following steps: 1. First determine the value of y1 2. Initiate a while loop that looks for getting the SD level we want. 3. Once it gets desired precision, break out of the while loop and return the result.
-
-Actually, to make this a little more fun, lets set the number of individual simulation to be a variable as well. Thus, the function we are after looks something like this:
+The way we can do this is through the following steps: 1. First determine the value of y2 (y1 is always zero for H2(x)). Initiate a while loop that looks for getting the SD level we want. 3. Once it gets desired precision, break out of the while loop and return the result.To make this a little more fun, lets set the number of individual simulation to be a variable as well. Thus, the function we are after looks something like this:
 
 ```{r}
 wrap_control_h2x_mc <- function (x1, x2, target_sd, num_mcs){
@@ -210,7 +212,7 @@ wrap_control_h2x_mc <- function (x1, x2, target_sd, num_mcs){
     mc_results <- c()
     
     for (i in 1:num_mcs) {
-      indiv_mc_result <- sample_h2x(x1, x2, n_sims) %>%
+      indiv_mc_result <- simulate_h2x(x1, x2, n_sims) %>%
         read_h2x_mc(x1, x2, y1 = 0, y2 = y2)
       
       mc_results <- c(mc_results, indiv_mc_result)
@@ -232,8 +234,19 @@ wrap_control_h2x_mc <- function (x1, x2, target_sd, num_mcs){
 
 
 ##Test
+Sys.time()
 wrap_control_h2x_mc(x1 = 0, x2=  1, target_sd = 0.001, num_mcs = 5)
-wrap_control_h2x_mc(x1 = 0, x2 = 0.2, target_sd = 0.000001, num_mcs = 5)
+wrap_control_h2x_mc(x1 = 0, x2 = 1, target_sd = 0.000001, num_mcs = 5)
+Sys.time()
 
+```
 
+We see two things here. First of all, the simulations run very fast. For me it took just 28 seconds to run the two test cases on first test, even though we run close to 33 million points five times over. This is not bad at all.
+
+```{r}
+Sys.time()
+for (i in 1:33000000*5) {
+  test <- 1+1
+}
+Sys.time()
 ```
