@@ -242,11 +242,3 @@ Sys.time()
 ```
 
 We see two things here. First of all, the simulations run very fast. For me it took just 28 seconds to run the two test cases on first test, even though we run close to 33 million points five times over. This is not bad at all.
-
-```{r}
-Sys.time()
-for (i in 1:33000000*5) {
-  test <- 1+1
-}
-Sys.time()
-```
