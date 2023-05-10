@@ -241,4 +241,34 @@ Sys.time()
 
 ```
 
-We see two things here. First of all, the simulations run very fast. For me it took just 28 seconds to run the two test cases on first test, even though we run close to 33 million points five times over. This is not bad at all.
+We see two things here. First of all, the simulations run very fast. For me it took just 28 seconds to run the two test cases on first test, even though we run close to 33 million points five times over. This is not bad at all. Lets visualize how the calculation time changes for each order of magnitude in accuracy.
+
+```{r}
+
+time_elapsed <- c()
+target_sigma <- 0.1 ^ seq(1, 6, by = 1) #A nice hack for geometric progressions from the internet
+
+for (i in 1:length(target_sigma)) {
+  time_start <- Sys.time()
+  wrap_control_h2x_mc(x1 = 0, x2=  1, target_sd = target_sigma[i], num_mcs = 20) #Note higher number of simulations
+  time_end <- Sys.time()
+  time_elapsed <- c(time_elapsed, time_end - time_start)
+}
+
+time_track_results <- data.frame(target_sigma, time_elapsed)
+
+time_track_results %>%
+  ggplot(aes(x = target_sigma, y = time_elapsed)) +
+  geom_point() +
+  geom_line(linetype = "dotted") +
+  theme_bw() +
+  scale_x_continuous(trans = "log10")
+
+
+```
+Now, this result is interesting. On the surface it suggests that after we get to the precision of 0.001, the time required to run the simulation becomes stable. Now, this is very counter-intuitive and there is an alternative answer to what is happening. If we recall, the function, it doubles the number of simulated points with every iteration. Likely, what we're seeing here, is that at certain point, the doubling of the number of simulated steps causes the precision to get to a level where R begins rounding up the outcomes to zero. 
+
+
+
+
+
