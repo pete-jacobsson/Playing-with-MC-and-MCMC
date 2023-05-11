@@ -271,19 +271,26 @@ Now, this result is interesting. On the surface it suggests that after we get to
 We can explore this by evaluating how much precision we get from different simulation counts. To do this, we shall return to using our wrapped function and trace output on a tighter grid than a double increase.
 
 ```{r}
-num_sims <- 1000 * 1.05 ^ seq(0, 300)
+#Set up vectors
+num_sims <- 100 * 1.1 ^ seq(0, 125) # Use compounding to determine num_sims
+max(num_sims) #This gives us a maximum num_sims of 14,930,888 
 times_elapsed <- c()
 output_precision <- c()
+mean_results <- c()
 
 for (i in 1:length(num_sims)){
+  #Run a loop for the different num_sims values
+  
   time_start <- Sys.time()
   mc_results <- c()
-  for (i in 1:20) {
-    
+  for (j in 1:20) {
+    #For each num_sims value, simulate twenty times
+    mc_results <- mc_results(wrap_h2x_mc(x1 = 0, x2 = 1, num_sims[i]))
   }
-  
-  
+  output_precision <- c(output_precision, sd(mc_results))
+  mean_results <- c(mean_results, mean(mc_results))
   time_end <- Sys.time()
+  times_elapsed <- c(times_elapsed, time_end - time_start)
 }
 
 
