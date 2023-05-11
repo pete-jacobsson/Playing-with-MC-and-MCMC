@@ -266,7 +266,32 @@ time_track_results %>%
 
 
 ```
-Now, this result is interesting. On the surface it suggests that after we get to the precision of 0.001, the time required to run the simulation becomes stable. Now, this is very counter-intuitive and there is an alternative answer to what is happening. If we recall, the function, it doubles the number of simulated points with every iteration. Likely, what we're seeing here, is that at certain point, the doubling of the number of simulated steps causes the precision to get to a level where R begins rounding up the outcomes to zero. 
+Now, this result is interesting. On the surface it suggests that after we get to the precision of 0.001, the time required to run the simulation becomes stable. Now, this is very counter-intuitive and there is an alternative answer to what is happening. If we recall, the function, it doubles the number of simulated points with every iteration. Likely, what we're seeing here, is that at certain point, the doubling of the number of simulated steps causes the precision to get to a level where R begins rounding up the outcomes to zero.
+
+We can explore this by evaluating how much precision we get from different simulation counts. To do this, we shall return to using our wrapped function and trace output on a tighter grid than a double increase.
+
+```{r}
+num_sims <- 1000 * 1.05 ^ seq(0, 300)
+times_elapsed <- c()
+output_precision <- c()
+
+for (i in 1:length(num_sims)){
+  time_start <- Sys.time()
+  mc_results <- c()
+  for (i in 1:20) {
+    
+  }
+  
+  
+  time_end <- Sys.time()
+}
+
+
+wrap_h2x_mc(0, 1, n_sims = 500)
+
+
+```
+
 
 
 
