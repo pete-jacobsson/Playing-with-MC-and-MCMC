@@ -300,7 +300,7 @@ results_table <- data.frame(num_sims, times_elapsed,
                             output_precision, mean_results)
 
 total_time <- total_time_end - total_time_start
-
+write.csv(results_table, "/home/pete/Documents/GitHub/Playing-with-MC-and-MCMC/mc_results.csv")
 ```
 
 
