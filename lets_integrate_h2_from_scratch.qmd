@@ -359,6 +359,15 @@ What would be interesting, is to extent the range of inquiry, and evaluate the s
 
 Having said that, at this stage I have drifted heavily from the main purpose of this small project, which was estimating the area under the curve. Indeed we had a solution however many pages ago - the **area under the curve of the binary entropy function is 0.7218 (to four significant figures)**.
 
-As for evaluating the benchmarking 
+As for evaluating the benchmarking the vectorized simulation against a for loopy simulation - this will follow in as another project.
+
+If you made it this far, thanks for reading!
+
+
+## Bibliography
+Lynch, S. 2007. *Introduction to Applied Bayesian Statistics and Estimation for Social Scientists*. Springer: Berlin and New York (?)
+MacKay, D. 2003. *Information Theory, Inference, and Learning Algorithms*. Cambridge University Press: Cambridge.
+Shannon, C. 1948 A mathematical theory of communication. *Bell Sys. Tech. J.* 27: 379-423, 623-656.
+
 
 
