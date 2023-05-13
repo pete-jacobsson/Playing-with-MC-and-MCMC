@@ -1,0 +1,8 @@
+---
+title: "Lets build a Monte Carlo simulation with dplyr"
+author: "Pete Jacobsson"
+format: html
+---
+
+
+So, a couple weeks ago I decided to check the area under the curve of the binary entropy function (you can check out my Github for how that went). Of course, as it is with these things, I decided along the way to make my life simpler in the code department and instead of doing for loopiness, which is the usual way of building an MC simulation (or at least the way I learned it), I used dplyr to vectorize the operation and save myself some code time. Having done that, I happily went off to explore the properties of the sampler and, lo and behold, it turned out to be much faster than I thought it would be. So in this exploration I want to compare the speed of the dplyr vectorized MC simulation against that of the 

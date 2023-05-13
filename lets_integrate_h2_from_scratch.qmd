@@ -8,13 +8,13 @@ format:
 editor: visual
 ---
 
-I learned the binary entropy function from MacKay's 2003 *Information Theory, Inference, and Learning Algorithms*, where it is used to derive approximations for combinations in evaluating the probabilities of error in different repetition codes (basically codes that rely on transmitting the same bit multiple times to minimize risk of transmission errors).
+I learned the binary entropy function from MacKay's 2003 *Information Theory, Inference, and Learning Algorithms*, where it is used to derive approximations for combinations in evaluating the probabilities of error in different repetition codes (basically codes that rely on transmitting the same bit multiple times to minimize risk of transmission errors). In particular it is important to Shannon's calculations of disk capacity (see MacKay 2003:15, original is Shannon 1948).
 
 The formula for the function looks like this(MacKay 2003: 2): $$
-H_2(x) = xlog \frac{1}{x} + (1 - x)log \frac{1}{1-x}
+H_2(x) = xlog_2 \frac{1}{x} + (1 - x)log_2 \frac{1}{1-x}
 $$
 
-What I want to do here is to build an Monte Carlo rejection simulation to integrate the function. Why use Monte Carlo? Because I'm too thick to integrate this thing. Why a rejection Monte Carlo? Because, as we'll see, it's dead easy to set. What is a Monte Carlo simulation? It's a stochastic method of evaluating area under a curve - the rejection approach relies on drawing a known size box around the area over which we want to integrate, dropping a whole lot of dots on it, and then checking what proportion ended up below the curve.
+So we have a nice function, lying between zero and one, but **what is what is the area under the curve?**. Now, I've never progressed far beyond Calculus 101 (partial fractions are still a minor head ache), so instead of trying to solve it, I thought, hey lets cheat and do it with Monte Carlo rejection simulation. Why a rejection Monte Carlo? Because, as we'll see, it's dead easy to set. What is a Monte Carlo simulation? It's a stochastic method of evaluating area under a curve - the rejection approach relies on drawing a known size box around the area over which we want to integrate, dropping a whole lot of dots on it, and then checking what proportion ended up below the curve.
 
 However, before getting to building the simulation lets first write a function for the binary entropy function and plot the beast.
 
@@ -356,5 +356,9 @@ Insights:
 * For lower sims numbers, we can see that relationships are not linear. I suspect this has to do with the times it takes for the computer to initiate the operations. As the number of sims increases, it is the duration of the operations cthat becomes the limiting factor. 
 
 What would be interesting, is to extent the range of inquiry, and evaluate the slope of the relationship between times elapsed and precision gained. Also, it would be interesting to evaluate how the individual results vary around the mean over multiple runs with increasing simulation counts. 
+
+Having said that, at this stage I have drifted heavily from the main purpose of this small project, which was estimating the area under the curve. Indeed we had a solution however many pages ago - the **area under the curve of the binary entropy function is 0.7218 (to four significant figures)**.
+
+As for evaluating the benchmarking 
 
 
