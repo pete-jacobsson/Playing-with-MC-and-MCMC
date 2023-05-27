@@ -1,0 +1,51 @@
+---
+title: "Lets Grid Approximate"
+format: html
+---
+
+This is another MacKay inspired excercise. Here we'll try to solve the following problem by grid approximation:
+* We are throwing a bent coin (aka magical device invented for purposes of probability analysis)
+* We receive a certain number of heads in a certain number of throws
+* What is the probability of heads coming up on the coin?
+
+This is very much an exercise in Bayesian inference. Normally this could be solved easily using the Beta-binomial conjugate prior. However, in this case we will use it to have a look at writing a grid approximation solution. Why? Because it is fun!
+
+```{r}
+## First set up the grid. We will take 100 points from 0 to 1. Next we shall assign a uniform prior across the grid.
+
+grid_results <- data.frame(grid = seq(from = 0, to = 1, length.out = 100),
+                           prior = rep(1 / 100, 100))
+
+```
+
+Next we need some outcome data for the coin tosses. Lets say we did 30 tosses, with 12 Heads coming total. From here we can calculate the likelihood function as required. [NOTE TO SELF: given time, put in the equations here]
+
+```{r}
+
+likelihood_function <- function (n_head, n_total, p_head){
+  likelihood <- choose(n_total, n_head) * p_head ^ n_head * (1 - p_head) ^ (n_total - n_head)
+  likelihood
+}
+
+likelihood_function(n_head = 12, n_total = 30, p_head = 0.5)
+
+```
+
+```{r}
+## Lets get the likelihoods into the table
+library(dplyr)
+library(ggplot2)
+
+grid_results <- grid_results %>%
+  mutate(likelihood = likelihood_function(12, 30, grid))
+
+
+##At this stafe we can plot the likelihood function
+grid_results %>%
+  ggplot(aes(x = grid, y = likelihood)) +
+  geom_bar(stat = "identity", color = "grey40", fill = "grey40") +
+  theme_bw()
+  
+
+```
+So we have the likelihood function. Good news - on a uniform prior it is proportional to the actual posterior distribution. Still it is not a probability distribution. To get that we need a couple more steps :)
