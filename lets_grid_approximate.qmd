@@ -13,8 +13,7 @@ This is very much an exercise in Bayesian inference. Normally this could be solv
 ```{r}
 ## First set up the grid. We will take 100 points from 0 to 1. Next we shall assign a uniform prior across the grid.
 
-grid_results <- data.frame(grid = seq(from = 0, to = 1, length.out = 100),
-                           prior = rep(1 / 100, 100))
+grid_results <- data.frame(grid = seq(from = 0, to = 1, length.out = 100))
 
 ```
 
@@ -49,3 +48,41 @@ grid_results %>%
 
 ```
 So we have the likelihood function. Good news - on a uniform prior it is proportional to the actual posterior distribution. Still it is not a probability distribution. To get that we need a couple more steps :)
+
+First of these is to get a prior distribution. Given that we are between zero and one, and given the nature of the problem, lets model it using a Beta distribution (2, 2) - we would like to believe that the coin is not very bent.
+
+```{r}
+grid_results <- grid_results %>%
+  mutate(
+    prior = dbeta(grid, grid, 2, 2),
+    likelihood_times_prior = likelihood * prior)
+
+
+grid_results %>%
+  ggplot(aes(x = grid)) +
+  geom_bar(aes(y = likelihood_times_prior), stat = "identity", color = "grey60", fill = "grey60") +
+    geom_bar(aes(y = likelihood), stat = "identity", color = "grey40", fill = "grey40") +
+  theme_bw()
+
+```
+
+Now we need the denominator - in this case it is the sum of everything from the numerator.
+```{r}
+denominator <- sum(grid_results$likelihood_times_prior, na.rm = TRUE)
+
+grid_results <- grid_results %>%
+  mutate(posterior = likelihood_times_prior / denominator)
+
+## Check posterior sums to one
+sum(grid_results$posterior, na.rm = TRUE)
+
+grid_results %>%
+  ggplot(aes(x = grid)) +
+  geom_bar(aes(y = likelihood_times_prior), stat = "identity", color = "grey60", fill = "grey60") +
+    geom_bar(aes(y = posterior), stat = "identity", color = "grey40", fill = "grey40") +
+  theme_bw()
+
+```
+
+Now lets wrap it into a function!
+
