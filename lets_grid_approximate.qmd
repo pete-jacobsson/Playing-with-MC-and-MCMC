@@ -156,5 +156,9 @@ sum(approximate_binomial_grid(200, 300, 4, 40)$posterior)
 
 
 ```
+So, now we have a working couple of functions making grid estimates of this particular model possible. Lets stick these two functions into an R package. This will be my first attempt at doing this, lets see how it explodes! (for reference, I'm using https://ourcodingclub.github.io/tutorials/writing-r-package/#:~:text=To%20get%20started%20on%20a,with%20the%20New%20Directory%20option. as reference).
+
+
+
 
 
