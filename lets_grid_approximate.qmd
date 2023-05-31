@@ -158,7 +158,29 @@ sum(approximate_binomial_grid(200, 300, 4, 40)$posterior)
 ```
 So, now we have a working couple of functions making grid estimates of this particular model possible. Lets stick these two functions into an R package. This will be my first attempt at doing this, lets see how it explodes! (for reference, I'm using https://ourcodingclub.github.io/tutorials/writing-r-package/#:~:text=To%20get%20started%20on%20a,with%20the%20New%20Directory%20option. as reference).
 
+```{r}
+##Install and run the packages required to create the packages (Chicken and egg?)
+install.packages("devtools")
+install.packages("roxygen2")
+
+library(devtools)
+library(roxygen2)
+```
 
 
+In the next step, I create a file containing the script for our functions. Trust me on this one.
 
+Now lets see if we can load it...
+
+
+```{r}
+setwd("/home/pete/Documents/GitHub/Playing-with-MC-and-MCMC/bayes_from_scratch_r_package")
+rm(calculate_likelihood)
+rm(approximate_binomial_grid)
+
+load_all(".")
+
+```
+Attempt 1: FAIL - needed to add the information to the DESCRIPTION file. Ooopsie.
+Attempt 2: FAIL - Code chunk hung up. Try in a script.
 
