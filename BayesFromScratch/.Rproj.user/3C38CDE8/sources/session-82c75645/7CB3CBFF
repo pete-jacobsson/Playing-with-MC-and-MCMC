@@ -3,7 +3,7 @@
     "path": "~/Documents/GitHub/Playing-with-MC-and-MCMC/BayesFromScratch/DESCRIPTION",
     "project_path": "DESCRIPTION",
     "type": "dcf",
-    "hash": "2669074659",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1685616385142.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "7,12",
+        "cursorPosition": "9,14",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1685616502,
+    "lastKnownWriteTime": 1685688959,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1685616502863,
+    "last_content_update": 1685688959,
     "read_only": false,
     "read_only_alternatives": []
 }
